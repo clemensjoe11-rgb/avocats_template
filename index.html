@@ -31,19 +31,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-  :root{--brand:#e50914;--accent:#ff4d57;--bg:#f7f8fa;--text:#0e1116;--surface:#ffffff;--border:rgba(2,6,23,.12);--hero-img:url('assets/img/hero.jpg')}
+  :root{
+    --brand:#e50914;--accent:#ff4d57;
+    --bg:#f7f8fa;--text:#0e1116;--surface:#ffffff;--border:rgba(2,6,23,.12);
+    --hero-img:url('assets/img/hero.jpg')
+  }
   [data-theme="dark"]{--bg:#0b0c0f;--text:#e7eaee;--surface:#17191d;--border:rgba(255,255,255,.08)}
   html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
   body{padding-top:var(--nav-h,72px)}
+
+  /* Hero */
   .hero{position:relative;min-height:calc(100vh - var(--nav-h));display:flex;align-items:center}
   .hero::before{content:"";position:absolute;inset:0;background-image:var(--hero-img);background-size:cover;background-position:center;z-index:-1;transform:translate3d(0,var(--hero-y,0),0) scale(var(--hero-scale,1.08))}
   .hero::after{content:"";position:absolute;inset:0;background:
     radial-gradient(900px 420px at 22% 18%, rgba(229,9,20,.60), transparent 55%),
     linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.45))}
   .glass-strong{backdrop-filter:saturate(180%) blur(14px);background-color:rgba(10,10,10,.55);border:1px solid rgba(255,255,255,.12)}
+
+  /* Layout */
   section{padding-block:6rem}
   .section-title .accent{color:var(--brand)}
-  .card-lite{background:var(--surface);border:1px solid var(--border);border-radius:1rem;padding:1rem}
+
+  /* Cards + hover */
+  .card-lite{background:var(--surface);border:1px solid var(--border);border-radius:1rem;padding:1rem;transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
+  .hover-lift:hover{transform:translateY(-4px);border-color:rgba(229,9,20,.65);box-shadow:0 18px 40px rgba(0,0,0,.25),0 0 0 1px rgba(229,9,20,.45) inset,0 0 18px rgba(229,9,20,.18)}
+  .icon-pill{width:42px;height:42px;display:grid;place-items:center;border-radius:.75rem;background:rgba(229,9,20,.1);color:var(--brand);border:1px solid rgba(229,9,20,.25)}
+  .avatar{width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,#1a1b1e,#0f0f10);color:#fff;border:1px solid rgba(255,255,255,.08)}
+  .map-ring{position:relative;width:280px;height:280px;border-radius:50%;overflow:hidden;margin-inline:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  .map-ring iframe{width:100%;height:100%;border:0;filter:grayscale(20%) contrast(105%)}
+  .map-ring::before,.map-ring::after{content:"";position:absolute;width:80px;height:80px;border:2px solid rgba(229,9,20,.35);border-radius:.75rem}
+  .map-ring::before{left:-20px;top:40px}.map-ring::after{right:-20px;bottom:40px}
+  .hours-table{width:100%;border-collapse:separate;border-spacing:0}
+  .hours-table td{padding:.75rem .75rem;vertical-align:middle;color:var(--text)}
+  .hours-table .lbl{color:#6b7280;width:40%}
+  .hours-table tr+tr td{border-top:1px solid var(--border)}
   </style>
 </head>
 <body>
@@ -89,23 +110,139 @@
 <section id="leistungen">
   <div class="container">
     <h2 class="section-title h1 mb-1">Unsere <span class="accent">Dienstleistungen</span></h2>
-    <div class="row g-3 g-md-4 mt-3">
-      <div class="col-md-6 col-xl-4"><div class="card-lite">Scheidung & Trennung</div></div>
-      <div class="col-md-6 col-xl-4"><div class="card-lite">Sorgerecht & Umgang</div></div>
-      <div class="col-md-6 col-xl-4"><div class="card-lite">Unterhalt</div></div>
+    <p class="text-secondary mb-4">Klare Strukturen. Präzise Umsetzung. Bessere Ergebnisse.</p>
+    <div class="row g-3 g-md-4 mt-1">
+      <div class="col-md-6 col-xl-4">
+        <div class="card-lite hover-lift p-4 h-100">
+          <div class="d-flex align-items-start gap-3 mb-2">
+            <div class="icon-pill"><i class="bi bi-house-heart"></i></div>
+            <div>
+              <h3 class="h5 mb-1">Scheidung & Trennung</h3>
+              <p class="text-secondary mb-0 small">Zugewinn, Sorgerecht, Unterhalt. Alles aus einer Hand.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-4">
+        <div class="card-lite hover-lift p-4 h-100">
+          <div class="d-flex align-items-start gap-3 mb-2">
+            <div class="icon-pill"><i class="bi bi-people"></i></div>
+            <div>
+              <h3 class="h5 mb-1">Sorgerecht & Umgang</h3>
+              <p class="text-secondary mb-0 small">Kindeswohlbasiert. Tragfähige Umgangsregelungen.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-4">
+        <div class="card-lite hover-lift p-4 h-100">
+          <div class="d-flex align-items-start gap-3 mb-2">
+            <div class="icon-pill"><i class="bi bi-cash-coin"></i></div>
+            <div>
+              <h3 class="h5 mb-1">Unterhalt</h3>
+              <p class="text-secondary mb-0 small">Ansprüche berechnen, dynamisch sichern, effizient durchsetzen.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="team">
+<section id="team" class="bg-body">
   <div class="container">
     <h2 class="section-title h1 mb-1">Unser <span class="accent">Team</span></h2>
+    <p class="text-secondary mb-4">Erfahren. Fokussiert. An Ihrer Seite.</p>
+    <div class="row g-3 g-md-4">
+      <div class="col-md-6 col-xl-3">
+        <div class="card-lite hover-lift p-4 h-100 text-center">
+          <div class="avatar mx-auto mb-3">MSA</div>
+          <div class="fw-semibold">Maître Sarah Alali</div>
+          <div class="small text-secondary">Partnerin · Familienrecht</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="card-lite hover-lift p-4 h-100 text-center">
+          <div class="avatar mx-auto mb-3">MDD</div>
+          <div class="fw-semibold">Maître David Dupont</div>
+          <div class="small text-secondary">Associate · Zivilrecht</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="card-lite hover-lift p-4 h-100 text-center">
+          <div class="avatar mx-auto mb-3">MCM</div>
+          <div class="fw-semibold">Maître Claire Martin</div>
+          <div class="small text-secondary">Counsel · Familienrecht</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="card-lite hover-lift p-4 h-100 text-center">
+          <div class="avatar mx-auto mb-3">MPB</div>
+          <div class="fw-semibold">Maître Pierre Bernard</div>
+          <div class="small text-secondary">Associate · Immobilienrecht</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<section id="kontakt">
+<section id="kontakt" class="bg-light">
   <div class="container">
     <h2 class="section-title h1 mb-1 text-center">Kontakt<span class="accent">aufnahme</span></h2>
+    <p class="text-secondary text-center mb-4">Vereinbaren Sie eine persönliche Beratung.</p>
+    <div class="row g-4 align-items-start justify-content-center">
+      <!-- links: Map + Öffnungszeiten -->
+      <div class="col-lg-6">
+        <div class="map-ring mx-auto mb-3">
+          <iframe title="Google Maps – Alali Avocats, Paris" loading="lazy" allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.796541053421!2d2.3469!3d48.8589!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e1f06b2c3a1%3A0x6b1b3c6f2d!2sCh%C3%A2telet%2C%2075001%20Paris%2C%20France!5e0!3m2!1sde!2sfr!4v1680000000000"></iframe>
+        </div>
+        <div class="card-lite hover-lift p-3">
+          <div class="d-flex align-items-start gap-3">
+            <div class="icon-pill"><i class="bi bi-clock"></i></div>
+            <div class="w-100">
+              <div class="fw-semibold mb-2">Öffnungszeiten</div>
+              <div class="table-responsive">
+                <table class="hours-table table mb-0 align-middle">
+                  <tbody>
+                    <tr><td class="lbl">Mo–Fr</td><td class="val text-end text-md-start">9:00 – 18:00</td></tr>
+                    <tr><td class="lbl">Samstag</td><td class="val text-end text-md-start">Nach Vereinbarung</td></tr>
+                    <tr><td class="lbl">Sonntag</td><td class="val text-end text-md-start">Geschlossen</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- rechts: Kontaktkarten -->
+      <div class="col-lg-6">
+        <div class="d-grid gap-3">
+          <div class="card-lite hover-lift p-3 d-flex align-items-start gap-3">
+            <div class="icon-pill"><i class="bi bi-geo-alt"></i></div>
+            <div>
+              <div class="fw-semibold">Adresse</div>
+              <div class="small text-secondary">123 Avenue des Champs-Élysées<br>75008 Paris, France</div>
+            </div>
+          </div>
+          <div class="card-lite hover-lift p-3 d-flex align-items-start gap-3">
+            <div class="icon-pill"><i class="bi bi-telephone"></i></div>
+            <div>
+              <div class="fw-semibold">Telefon</div>
+              <div class="small text-secondary">+33 1 23 45 67 89<br>+33 1 23 45 67 88</div>
+            </div>
+          </div>
+          <div class="card-lite hover-lift p-3 d-flex align-items-start gap-3">
+            <div class="icon-pill"><i class="bi bi-envelope"></i></div>
+            <div>
+              <div class="fw-semibold">E-Mail</div>
+              <div class="small text-secondary">contact@alali-avocats.fr<br>info@alali-avocats.fr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
