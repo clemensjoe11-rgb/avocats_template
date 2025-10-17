@@ -18,9 +18,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --brand:#e50914;--accent:#ff4d57;
+  --brand:#8d6041;--accent:#a98770;
   --bg:#f7f8fa;--text:#0e1116;--surface:#ffffff;--border:rgba(2,6,23,.12);
-  --hero-img:url('assets/img/hero.jpg')
+  --hero-img:url('assets/img/header.png')
 }
 [data-theme="dark"]{
   --bg:#0b0c0f;--text:#e7eaee;--surface:#17191d;--border:rgba(255,255,255,.08)
@@ -31,7 +31,7 @@ html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Ar
 body{padding-top:var(--nav-h,72px)}
 
 /* Navbar sticky + reveal */
-.navbar{position:fixed;top:0;left:0;right:0;z-index:9999;background:transparent;transition:background-color .3s,box-shadow .3s,backdrop-filter .3s}
+.navbar{background:#8d6041;position:fixed;top:0;left:0;right:0;z-index:9999;background:transparent;transition:background-color .3s,box-shadow .3s,backdrop-filter .3s}
 :root:not([data-theme="dark"]) .navbar .navbar-brand,
 :root:not([data-theme="dark"]) .navbar .nav-link{color:#0e1116}
 :root:not([data-theme="dark"]) .navbar .nav-link:hover{color:#000}
@@ -98,13 +98,17 @@ section{padding-block:6rem}
 [data-theme="dark"] .hours-table tr+tr td{border-top:1px solid rgba(255,255,255,.12)}
 [data-theme="dark"] .hours-table tr:hover{background:#15181d}
 
+
+.navbar .nav-link,.navbar .navbar-brand,.navbar .btn{color:#fff !important}
+.navbar .btn.btn-danger{background: #8d6041;border-color: #8d6041}
+.navbar .btn.btn-ghost{color:#fff;border-color: rgba(255,255,255,.6)}
 </style>
 
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark py-3">
   <div class="container">
-    <a class="navbar-brand fw-semibold" href="#"><i class="bi bi-balance-scale me-2"></i>Alali Avocats</a>
+    <a class="navbar-brand fw-semibold" href="#"><img src="assets/img/header.png" alt="Logo" style="height:40px;width:auto" class="me-2 align-text-bottom" /><i class="bi bi-balance-scale me-2"></i>Alali Avocats</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Navigation umschalten">
       <span class="navbar-toggler-icon"></span>
     </button>
