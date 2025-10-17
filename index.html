@@ -20,7 +20,12 @@
 :root{
   --brand:#8d6041;--accent:#a98770;
   --bg:#f7f8fa;--text:#0e1116;--surface:#ffffff;--border:rgba(2,6,23,.12);
-  --hero-img:url('assets/img/header.png')
+  
+  --bs-danger: #8d6041;
+  --bs-danger-rgb: 141,96,65;
+  --bs-link-color: #8d6041;
+  --bs-link-hover-color: #8d6041;
+--hero-img:url('assets/img/header.png')
 }
 [data-theme="dark"]{
   --bg:#0b0c0f;--text:#e7eaee;--surface:#17191d;--border:rgba(255,255,255,.08)
@@ -40,9 +45,14 @@ body{padding-top:var(--nav-h,72px)}
 
 /* Hero */
 .hero{position:relative;min-height:calc(100vh - var(--nav-h));display:flex;align-items:center}
-.hero::before{content:"";position:absolute;inset:0;background-image:var(--hero-img);background-size:cover;background-position:center;z-index:-1;transform:translate3d(0,var(--hero-y,0),0) scale(var(--hero-scale,1.08))}
+.hero::before{content:"";position:absolute;inset:0;background-image:var(
+  --bs-danger: #8d6041;
+  --bs-danger-rgb: 141,96,65;
+  --bs-link-color: #8d6041;
+  --bs-link-hover-color: #8d6041;
+--hero-img);background-size:cover;background-position:center;z-index:-1;transform:translate3d(0,var(--hero-y,0),0) scale(var(--hero-scale,1.08))}
 .hero::after{content:"";position:absolute;inset:0;background:
-  radial-gradient(900px 420px at 22% 18%, rgba(229,9,20,.60), transparent 55%),
+  radial-gradient(900px 420px at 22% 18%, rgba(141,96,65,.60), transparent 55%),
   linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.45))}
 .glass-strong{backdrop-filter:saturate(180%) blur(14px);background-color:rgba(10,10,10,.55);border:1px solid rgba(255,255,255,.12)}
 :root:not([data-theme="dark"]) .glass-strong{background-color:rgba(255,255,255,.58);border:1px solid rgba(2,6,23,.08)}
@@ -60,17 +70,17 @@ section{padding-block:6rem}
 
 /* Cards + Hover */
 .card-lite{background:var(--surface);border:1px solid var(--border);border-radius:1rem;padding:1rem;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
-.hover-lift:hover{transform:translateY(-4px);border-color:rgba(229,9,20,.65);box-shadow:0 18px 40px rgba(0,0,0,.25),0 0 0 1px rgba(229,9,20,.45) inset,0 0 18px rgba(229,9,20,.18)}
+.hover-lift:hover{transform:translateY(-4px);border-color:rgba(141,96,65,.65);box-shadow:0 18px 40px rgba(0,0,0,.25),0 0 0 1px rgba(141,96,65,.45) inset,0 0 18px rgba(141,96,65,.18)}
 [data-theme="dark"] .card-lite{background:#17191d;border-color:rgba(255,255,255,.08)}
 [data-theme="dark"] .bg-light{background:#0f1215 !important}
 [data-theme="dark"] #leistungen,[data-theme="dark"] .bg-body{background:#0b0c0f !important}
 
 /* UI bits */
-.icon-pill{width:42px;height:42px;display:grid;place-items:center;border-radius:.75rem;background:rgba(229,9,20,.1);color:var(--brand);border:1px solid rgba(229,9,20,.25)}
+.icon-pill{width:42px;height:42px;display:grid;place-items:center;border-radius:.75rem;background:rgba(141,96,65,.1);color:var(--brand);border:1px solid rgba(141,96,65,.25)}
 .avatar{width:56px;height:56px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,#1a1b1e,#0f0f10);color:#fff;border:1px solid rgba(255,255,255,.08)}
 .map-ring{position:relative;width:280px;height:280px;border-radius:50%;overflow:hidden;margin-inline:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .map-ring iframe{width:100%;height:100%;border:0;filter:grayscale(20%) contrast(105%)}
-.map-ring::before,.map-ring::after{content:"";position:absolute;width:80px;height:80px;border:2px solid rgba(229,9,20,.35);border-radius:.75rem}
+.map-ring::before,.map-ring::after{content:"";position:absolute;width:80px;height:80px;border:2px solid rgba(141,96,65,.35);border-radius:.75rem}
 .map-ring::before{left:-20px;top:40px}
 .map-ring::after{right:-20px;bottom:40px}
 
@@ -102,6 +112,9 @@ section{padding-block:6rem}
 .navbar .nav-link,.navbar .navbar-brand,.navbar .btn{color:#fff !important}
 .navbar .btn.btn-danger{background: #8d6041;border-color: #8d6041}
 .navbar .btn.btn-ghost{color:#fff;border-color: rgba(255,255,255,.6)}
+
+.badge.text-bg-danger{background:var(--bs-danger) !important;color:#fff !important;border-color:var(--bs-danger)!important}
+.btn.btn-danger{background:var(--bs-danger) !important;border-color:var(--bs-danger) !important}
 </style>
 
 </head>
@@ -128,18 +141,7 @@ section{padding-block:6rem}
 </nav>
 
 <header class="hero">
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-12 col-lg-8 col-xl-6">
-        <div class="glass-strong rounded-4 p-4 p-md-5">
-          <span class="badge text-bg-danger mb-3">Familienrecht | Scheidung | Auflösung</span>
-          <h1 class="display-5 fw-semibold mb-3">Klar. Menschlich. Durchsetzungsstark.</h1>
-          <p class="lead mb-4">Spezialisiert auf Familienrecht, Scheidungen und Trennungsfolgen.</p>
-          <div class="d-flex flex-wrap gap-2">
-            <a href="#kontakt" class="btn btn-danger btn-lg"><i class="bi bi-calendar2-check me-2"></i>Termin vereinbaren</a>
-            <a href="#leistungen" class="btn btn-ghost btn-lg"><i class="bi bi-arrow-right-circle me-2"></i>Dienstleistungen ansehen</a>
-          </div>
-        </div>
+  <div class="container py-5"><div class="d-flex justify-content-center align-items-center" style="min-height:60vh"><img src="assets/img/header.png" alt="Firmalogo" style="max-width:70%;height:auto"/></div></div>
       </div>
     </div>
   </div>
