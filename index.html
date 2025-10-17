@@ -17,16 +17,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-
 :root{
   --brand:#8d6041;--accent:#a98770;
+  --bs-danger:#8d6041;
+  --bs-danger-rgb:141,96,65;
+
+  --brand:#8d6041;--accent:#a98770;
   --bg:#f7f8fa;--text:#0e1116;--surface:#ffffff;--border:rgba(2,6,23,.12);
-  
-  --bs-danger: #8d6041;
-  --bs-danger-rgb: 141,96,65;
-  --bs-link-color: #8d6041;
-  --bs-link-hover-color: #8d6041;
---hero-img:url('assets/img/header.png');
+  --hero-img:url('assets/img/header.png')
 }
 [data-theme="dark"]{
   --bg:#0b0c0f;--text:#e7eaee;--surface:#17191d;--border:rgba(255,255,255,.08)
@@ -37,7 +35,7 @@ html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Ar
 body{padding-top:var(--nav-h,72px)}
 
 /* Navbar sticky + reveal */
-.navbar{background:#8d6041;position:fixed;top:0;left:0;right:0;z-index:9999;background:transparent;transition:background-color .3s,box-shadow .3s,backdrop-filter .3s}
+.navbar{position:fixed;top:0;left:0;right:0;z-index:9999;background:transparent;transition:background-color .3s,box-shadow .3s,backdrop-filter .3s}
 :root:not([data-theme="dark"]) .navbar .navbar-brand,
 :root:not([data-theme="dark"]) .navbar .nav-link{color:#0e1116}
 :root:not([data-theme="dark"]) .navbar .nav-link:hover{color:#000}
@@ -46,12 +44,7 @@ body{padding-top:var(--nav-h,72px)}
 
 /* Hero */
 .hero{position:relative;min-height:calc(100vh - var(--nav-h));display:flex;align-items:center}
-.hero::before{content:"";position:absolute;inset:0;background-image:var(
-  --bs-danger: #8d6041;
-  --bs-danger-rgb: 141,96,65;
-  --bs-link-color: #8d6041;
-  --bs-link-hover-color: #8d6041;
---hero-img);background-size:cover;background-position:center;z-index:-1;transform:translate3d(0,var(--hero-y,0),0) scale(var(--hero-scale,1.08))}
+.hero::before{content:"";position:absolute;inset:0;background-image:var(--hero-img);background-size:cover;background-position:center;z-index:-1;transform:translate3d(0,var(--hero-y,0),0) scale(var(--hero-scale,1.08))}
 .hero::after{content:"";position:absolute;inset:0;background:
   radial-gradient(900px 420px at 22% 18%, rgba(141,96,65,.60), transparent 55%),
   linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.45))}
@@ -110,19 +103,18 @@ section{padding-block:6rem}
 [data-theme="dark"] .hours-table tr:hover{background:#15181d}
 
 
+/* Brand overrides */
+.badge.text-bg-danger{background:#8d6041 !important;border-color:#8d6041 !important;color:#fff !important}
+.btn.btn-danger{background:#8d6041 !important;border-color:#8d6041 !important}
 .navbar .nav-link,.navbar .navbar-brand,.navbar .btn{color:#fff !important}
-.navbar .btn.btn-danger{background: #8d6041;border-color: #8d6041}
-.navbar .btn.btn-ghost{color:#fff;border-color: rgba(255,255,255,.6)}
-
-.badge.text-bg-danger{background:var(--bs-danger) !important;color:#fff !important;border-color:var(--bs-danger)!important}
-.btn.btn-danger{background:var(--bs-danger) !important;border-color:var(--bs-danger) !important}
+.navbar{background:#8d6041 !important}
 </style>
 
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark py-3">
   <div class="container">
-    <a class="navbar-brand fw-semibold" href="#"><img src="assets/img/header.png" alt="Logo" style="height:40px;width:auto" class="me-2 align-text-bottom" /><i class="bi bi-balance-scale me-2"></i>Alali Avocats</a>
+    <a class="navbar-brand fw-semibold" href="#"><i class="bi bi-balance-scale me-2"></i>Alali Avocats</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Navigation umschalten">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -142,9 +134,8 @@ section{padding-block:6rem}
 </nav>
 
 <header class="hero">
-  <div class="container py-5">
-    <div class="d-flex justify-content-center align-items-center" style="min-height:60vh">
-      <img src="assets/img/header.png" alt="Firmalogo" style="max-width:70%;height:auto" />
+  <div class="container py-5"><div class="d-flex justify-content-center align-items-center" style="min-height:60vh"><img src="assets/img/header.png" alt="Logo" style="max-width:70%;height:auto"/></div></div>
+      </div>
     </div>
   </div>
 </header>
