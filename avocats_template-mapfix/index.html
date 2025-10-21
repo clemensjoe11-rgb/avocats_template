@@ -24,8 +24,7 @@ body{padding-top:var(--nav-h,72px)}
 :root:not([data-theme="dark"]) .navbar.nav-reveal{background:rgba(255,255,255,.9);backdrop-filter:saturate(140%) blur(8px);box-shadow:0 8px 24px rgba(2,6,23,.12)}
 .hero{position:relative;min-height:calc(100vh - var(--nav-h));display:flex;align-items:center}
 .hero::before{content:"";position:absolute;inset:0;background-image:var(--hero-img);background-size:cover;background-position:center;z-index:-1;transform:translate3d(0,var(--hero-y,0),0) scale(var(--hero-scale,1.08))}
-.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(900px 420px at 22% 18%, rgba(141,96,65,.60), transparent 55%),linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.45));z-index:-1} /* fix */
-
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(900px 420px at 22% 18%, rgba(141,96,65,.60), transparent 55%),linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.45))}
 .glass-strong{backdrop-filter:saturate(180%) blur(14px);background-color:rgba(10,10,10,.55);border:1px solid rgba(255,255,255,.12)}
 :root:not([data-theme="dark"]) .glass-strong{background-color:rgba(255,255,255,.58);border:1px solid rgba(2,6,23,.08)}
 .btn-ghost{color:#0e1116;border:1px solid rgba(0,0,0,.2);background:transparent}
@@ -71,21 +70,10 @@ section{padding-block:6rem}
 .navbar .nav-link,.navbar .navbar-brand,.navbar .btn{color:#fff !important}
 .navbar{background:#8d6041 !important}
 
-/* Logo-Swap Light/Dark */
-img.logo{max-width:70%;height:auto;opacity:1;filter:none;mix-blend-mode:normal}
-img.logo.light-only{display:block}
-img.logo.dark-only{display:none}
-:root[data-theme="dark"] img.logo.light-only{display:none}
-:root[data-theme="dark"] img.logo.dark-only{display:block}
 
-
-.hero::after{ z-index:-1; } /* overlay behind content */
-
-img.logo{max-width:70%;height:auto;opacity:1;filter:none;mix-blend-mode:normal}
-img.logo.light-only{display:block}
-img.logo.dark-only{display:none}
-:root[data-theme="dark"] img.logo.light-only{display:none}
-:root[data-theme="dark"] img.logo.dark-only{display:block}
+.logo{max-width:70%;height:auto}
+:root[data-theme="dark"] .light-only{display:none !important}
+:root:not([data-theme="dark"]) .dark-only{display:none !important}
 </style>
 <!-- Leaflet -->
 <link href="https://unpkg.com/leaflet/dist/leaflet.css" rel="stylesheet"/>
@@ -112,11 +100,7 @@ img.logo.dark-only{display:none}
 </nav>
 <header class="hero">
 <div class="container py-5">
-<div class="d-flex justify-content-center align-items-center" style="min-height:60vh">
-<!-- Lightmode: schwarzes Logo | Darkmode: transparentes Logo -->
-
-
-<img alt="Logo" class="logo light-only" src="assets/img/meynioglu-law-black-sharp.png"/><img alt="Logo" class="logo dark-only" src="assets/img/meynioglu-law-transparent-clean.png"/></div>
+<div class="d-flex justify-content-center align-items-center" style="min-height:60vh"><img alt="Logo" class="logo light-only" src="assets/img/meynioglu-law-black.png"/><img alt="Logo" class="logo dark-only" src="assets/img/meynioglu-law-transparent-clean.png"/></div>
 </div>
 </header>
 <!-- Services -->
