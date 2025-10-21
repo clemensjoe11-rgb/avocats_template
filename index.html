@@ -25,7 +25,14 @@ body{padding-top:var(--nav-h,72px)}
 :root[data-theme="dark"] .navbar.nav-reveal{background:rgba(15,18,21,.85);backdrop-filter:saturate(140%) blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.5)}
 :root:not([data-theme="dark"]) .navbar.nav-reveal{background:rgba(255,255,255,.9);backdrop-filter:saturate(140%) blur(8px);box-shadow:0 8px 24px rgba(2,6,23,.12)}
 
-.hero{position:relative;min-height:calc(100vh - var(--nav-h));display:flex;align-items:center}
+.hero{
+  position:relative;
+  isolation:isolate;          /* <-- neu: eigener Stacking-Context */
+  min-height:calc(100vh - var(--nav-h));
+  display:flex;
+  align-items:center;
+}
+  
 .hero::before{
   content:"";position:absolute;inset:0;
   background-image:var(--hero-img);background-size:cover;background-position:center;
