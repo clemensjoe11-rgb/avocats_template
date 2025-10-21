@@ -13,39 +13,44 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
 <style>
-:root{--brand:#8d6041;--accent:#a98770;--bs-danger:#8d6041;--bs-danger-rgb:141,96,65;--brand:#8d6041;--accent:#a98770;--bg:#f7f8fa;--text:#0e1116;--surface:#ffffff;--border:rgba(2,6,23,.12);--hero-img:url('assets/img/header.png')}
+:root{--brand:#8d6041;--accent:#a98770;--bs-danger:#8d6041;--bs-danger-rgb:141,96,65;--bg:#f7f8fa;--text:#0e1116;--surface:#ffffff;--border:rgba(2,6,23,.12);--hero-img:url('assets/img/header.png')}
 [data-theme="dark"]{--bg:#0b0c0f;--text:#e7eaee;--surface:#17191d;--border:rgba(255,255,255,.08)}
 
 html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
 body{padding-top:var(--nav-h,72px)}
 
 .navbar{position:fixed;top:0;left:0;right:0;z-index:9999;background:transparent;transition:background-color .3s,box-shadow .3s,backdrop-filter .3s}
-:root:not([data-theme="dark"]) .navbar .navbar-brand,:root:not([data-theme="dark"]) .navbar .nav-link{color:#0e1116}
+:root:not([data-theme="dark"]) .navbar .navbar-brand,
+:root:not([data-theme="dark"]) .navbar .nav-link{color:#0e1116}
 :root:not([data-theme="dark"]) .navbar .nav-link:hover{color:#000}
 :root[data-theme="dark"] .navbar.nav-reveal{background:rgba(15,18,21,.85);backdrop-filter:saturate(140%) blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.5)}
 :root:not([data-theme="dark"]) .navbar.nav-reveal{background:rgba(255,255,255,.9);backdrop-filter:saturate(140%) blur(8px);box-shadow:0 8px 24px rgba(2,6,23,.12)}
 
 .hero{
   position:relative;
-  isolation:isolate;          /* <-- neu: eigener Stacking-Context */
+  isolation:isolate;
   min-height:calc(100vh - var(--nav-h));
   display:flex;
   align-items:center;
 }
-  
+/* Inhalt über Layer */
+.hero > *{position:relative;z-index:1}
+/* Bild-Layer */
 .hero::before{
   content:"";position:absolute;inset:0;
   background-image:var(--hero-img);background-size:cover;background-position:center;
-  z-index:-2;
   transform:translate3d(0,var(--hero-y,0),0) scale(var(--hero-scale,1.08));
+  z-index:0;
 }
+/* Schimmer-Layer */
 .hero::after{
   content:"";position:absolute;inset:0;
   background:
     radial-gradient(900px 420px at 22% 18%, rgba(141,96,65,.60), transparent 55%),
     linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.45));
-  z-index:-1;
   opacity:.65;
+  z-index:0;
+  pointer-events:none;
 }
 
 .glass-strong{backdrop-filter:saturate(180%) blur(14px);background-color:rgba(10,10,10,.55);border:1px solid rgba(255,255,255,.12)}
@@ -100,7 +105,7 @@ section{padding-block:6rem}
 .navbar .nav-link,.navbar .navbar-brand,.navbar .btn{color:#fff !important}
 .navbar{background:#8d6041 !important}
 
-/* Logo-Swap Light/Dark */
+/* Logo-Swap */
 img.logo{max-width:70%;height:auto}
 img.logo.light-only{display:block}
 img.logo.dark-only{display:none}
@@ -135,7 +140,6 @@ img.logo.dark-only{display:none}
 <header class="hero">
   <div class="container py-5">
     <div class="d-flex justify-content-center align-items-center" style="min-height:60vh">
-      <!-- Light: black logo | Dark: transparent/white logo -->
       <img src="assets/img/meynioglu-law-black-sharp.png" alt="Logo" class="logo light-only">
       <img src="assets/img/meynioglu-law-transparent-clean.png" alt="Logo" class="logo dark-only">
     </div>
@@ -285,10 +289,10 @@ img.logo.dark-only{display:none}
 })();
 </script>
 
- optional: eigene Skripte, nur einbinden wenn vorhanden 
- <script src="js/theme.js"></script>
+<!-- optionale eigene Skripte, nur einbinden wenn vorhanden -->
+  <script src="js/theme.js"></script>
   <script src="js/nav.js"></script>
- <script src="js/hero.js"></script>
- <script src="js/reveal.js"></script>
+  <script src="js/hero.js"></script>
+  <script src="js/reveal.js"></script>
 </body>
 </html>
