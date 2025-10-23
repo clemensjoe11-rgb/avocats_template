@@ -1,9 +1,17 @@
-# Alali Avocats – Landingpage
-Einfaches, statisches Projekt (Bootstrap 5).
+# Kanzlei + Terminbuchung
 
-## Start
-- Öffne `index.html` lokal oder deploye auf Render/Netlify/Vercel als *Static Site*.
-- Ersetze `assets/img/hero.jpg` durch ein eigenes Bild.
+- Statische Kanzlei-Seite unter `public/`
+- Termin-UI unter `/termin`
+- API: `/api/slots`, `/api/book`
+- MongoDB: `MONGODB_URI`
 
-## Dark/Light
-- Schalter rechts in der Navbar. Auswahl wird in `localStorage` gespeichert.
+## Lokal
+npm i
+cp .env.example .env
+# Passwort einsetzen
+npm run dev
+
+## Render
+- Build: `npm ci`
+- Start: `node server.js`
+- Env Var: `MONGODB_URI`
