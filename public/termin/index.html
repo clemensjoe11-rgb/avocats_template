@@ -233,22 +233,15 @@ const times=(a,b,step)=>{const out=[];for(let m=toMin(a);m<toMin(b);m+=step){out
 const tsFor=(date,hm)=>{const[h,m]=hm.split(':').map(Number);const x=new Date(date);x.setHours(h,m,0,0);return x.getTime()}
 const dayStart = ts => { const d=new Date(ts); d.setHours(0,0,0,0); return d.getTime(); };
 
-
-   function tick(){
-  const now = new Date();
-  clock.textContent = now.toLocaleString('de-DE', {
-    weekday:'short', day:'2-digit', month:'2-digit',
-    hour:'2-digit', minute:'2-digit'
-  });
-     
+// Headline time/date (oben und mobile Titel)
 function updateHeadline(){
   const d = new Date(selectedDayTs ?? Date.now());
   const txt = d.toLocaleString('de-DE', {
     weekday:'short', day:'2-digit', month:'2-digit',
     hour:'2-digit', minute:'2-digit'
   });
-  clock.textContent = txt;   // Kopf-Uhr
-  mTitle.textContent = txt;  // Mobile-Titel
+  clock.textContent = txt;
+  mTitle.textContent = txt;
 }
 setInterval(()=>{ if(!document.hidden) updateHeadline(); }, 30000);
 
@@ -263,7 +256,7 @@ function setSelectedDay(ts){
   renderAll();
 }
 
-// Load booked
+// Backend
 async function loadBooked(){
   try{
     const r=await fetch('/api/slots',{cache:'no-store'});
@@ -284,10 +277,7 @@ toggle.onclick = ()=>{ window.location.href = '/'; };
 jumpDate.value=new Date().toISOString().slice(0,10);
 jumpDate.onchange=()=>{ if(jumpDate.value) setSelectedDay(new Date(jumpDate.value).getTime()); };
 
-// Clock
-setInterval(updateHeadline, 30000);
-
-// Desktop render
+// Desktop
 function renderDesktop(){
   grid.innerHTML='';
   const now=Date.now(), base=startOfWeek(new Date()), weekStart=addDays(base,weekOffset*7);
@@ -316,7 +306,7 @@ function renderDesktop(){
   }
 }
 
-// Mobile render (Tagesansicht)
+// Mobile (Tagesansicht)
 function renderMobile(){
   updateHeadline();
   const d = new Date(selectedDayTs);
@@ -363,18 +353,6 @@ function selectSlot(ts,btn){
   confirmBtn.dataset.state='preview';
   confirmBar.classList.add('show');
 }
-
-// Confirm bar
-confirmBtn.onclick = () => {
-  if(confirmBtn.dataset.state === 'preview'){
-    formBlock.classList.add('show');
-    confirmBtn.textContent='Termin bestätigen';
-    confirmBtn.dataset.state='submit';
-    formBlock.scrollIntoView({behavior:'smooth',block:'start'});
-  }else{
-    form.requestSubmit();
-  }
-};
 
 // Render
 function isMobile(){return matchMedia('(max-width: 720px)').matches}
@@ -429,11 +407,7 @@ setSelectedDay(Date.now());
 addEventListener('resize', renderAll);
 termsBox.addEventListener('change', ()=> markTermsInvalid(!termsBox.checked));
 })();
-
- 
-}
-tick();
-setInterval(tick, 30000);
 </script>
+
 </body>
 </html>
