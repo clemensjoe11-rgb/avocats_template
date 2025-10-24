@@ -416,6 +416,16 @@ setSelectedDay(Date.now());
 addEventListener('resize', renderAll);
 termsBox.addEventListener('change', ()=> markTermsInvalid(!termsBox.checked));
 })();
+
+  function tick(){
+  const now = new Date();
+  clock.textContent = now.toLocaleString('de-DE', {
+    weekday:'short', day:'2-digit', month:'2-digit',
+    hour:'2-digit', minute:'2-digit'
+  });
+}
+tick();
+setInterval(tick, 30000);
 </script>
 </body>
 </html>
