@@ -27,21 +27,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-
 
 /* Shell */
 .card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px}
-
-/* Datum-Banner */
-.clock{
-  color:var(--text);
-  text-align:center;
-  margin:0 0 12px 0;
-  font-variant-numeric:tabular-nums;
-  font-weight:600;
-  font-size:clamp(22px,3.2vw,42px);
-  padding:14px 18px;
-  border-radius:16px;
-  background:#111519;
-  border:1px solid rgba(255,255,255,.08);
-  width:100%;
-}
+.clock{color:var(--muted);text-align:center;margin-bottom:12px;font-variant-numeric:tabular-nums}
 
 /* Collapsible */
 .collapsible{overflow:hidden;max-height:0;transition:max-height .35s ease}
@@ -61,16 +47,6 @@ body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-
 .slot.unavailable{background:transparent;border-color:rgba(255,255,255,.2);color:var(--muted);text-decoration:line-through;cursor:not-allowed}
 .now-line{position:absolute;left:0;right:0;height:2px;background:var(--danger);box-shadow:0 0 0 2px rgba(255,92,92,.15)}
 .now-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--danger);left:-6px;transform:translateY(-4px)}
-
-/* Wochenende deaktiviert/gestrichen */
-.day.weekend .slot,
-.weekend-slots .slot{
-  background:transparent;
-  border-color:rgba(255,255,255,.2);
-  color:var(--muted);
-  text-decoration:line-through;
-  cursor:not-allowed;
-}
 
 /* Formular */
 .form-block{display:none;margin-top:16px}
@@ -107,7 +83,7 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
   .inline{grid-template-columns:1fr 1fr}
 }
 
-/* Hide via class (nicht mehr genutzt für Home) */
+/* Toggle-Hide */
 .calendar-hidden .nav-core,
 .calendar-hidden #clock,
 .calendar-hidden #calWrap,
@@ -134,12 +110,12 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
       <button id="next" class="btn icon" aria-label="Nächste Woche">▶</button>
     </div>
     <div class="controls">
-      <button id="home" class="btn" type="button">Zurück zur Startseite</button>
+      <button id="toggle" class="btn" aria-expanded="true">Kalender verbergen</button>
     </div>
   </div>
 
   <div class="card">
-    <div id="clock" class="clock">—</div>
+    <div id="clock" class="clock">—:—</div>
 
     <!-- Desktop -->
     <div id="calWrap" class="collapsible open">
@@ -220,11 +196,10 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
 <script>
 (()=>{
 // Config
-const SLOT_MIN=30, START="08:00", END="17:00", LOCALE="de-DE";
+const SLOT_MIN=30, START="08:00", END="17:00";
 
 // State
 let weekOffset=0, selectedTs=null, mobileDayTs=null;
-let selectedDayTs = startOfDay(new Date()).getTime(); // für Banner
 const booked=new Set();
 
 // DOM
@@ -234,7 +209,7 @@ const mSlots=document.getElementById("mSlots");
 const clock=document.getElementById("clock");
 const prev=document.getElementById("prev");
 const next=document.getElementById("next");
-const home=document.getElementById("home");
+const toggle=document.getElementById("toggle");
 const calWrap=document.getElementById("calWrap");
 const form=document.getElementById("form");
 const msg=document.getElementById("msg");
@@ -246,14 +221,13 @@ const termsBox=document.getElementById("terms");
 const termsLabel=document.getElementById("termsLabel");
 
 // Utils
-function startOfDay(d){const x=new Date(d);x.setHours(0,0,0,0);return x;}
 const toMin=s=>{const[a,b]=s.split(':').map(Number);return a*60+b;}
 const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;}
 const startOfWeek=d=>{const x=new Date(d);const w=(x.getDay()+6)%7;x.setDate(x.getDate()-w);x.setHours(0,0,0,0);return x;}
 const times=(a,b,step)=>{const out=[];for(let m=toMin(a);m<toMin(b);m+=step){out.push(`${String(m/60|0).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`)}return out;}
 const tsFor=(date,hm)=>{const[h,m]=hm.split(':').map(Number);const x=new Date(date);x.setHours(h,m,0,0);return x.getTime()}
 
-// API: belegte Slots
+// Load booked from backend
 async function loadBooked(){
   try{
     const r=await fetch('/api/slots',{cache:'no-store'});
@@ -267,55 +241,33 @@ async function loadBooked(){
 }
 
 // Controls
-home.onclick = ()=>{ location.href='/'; };
 prev.onclick =()=>{weekOffset--; renderAll()}
 next.onclick =()=>{weekOffset++; renderAll()}
+toggle.onclick=()=>{const hide=document.body.classList.toggle('calendar-hidden');toggle.setAttribute('aria-expanded',String(!hide));calWrap.classList.toggle('open',!hide);if(hide){confirmBar.classList.remove('show');}}
 jumpDate.value=new Date().toISOString().slice(0,10);
-jumpDate.onchange=()=>{
-  if(!jumpDate.value) return;
-  const base=startOfWeek(new Date());
-  const target=startOfWeek(new Date(jumpDate.value));
-  const diffDays=Math.round((target-base)/86400000);
-  weekOffset=Math.trunc(diffDays/7);
-  selectedDayTs = startOfDay(new Date(jumpDate.value)).getTime();
-  mobileDayTs = selectedDayTs;
-  renderAll();
-};
+jumpDate.onchange=()=>{if(!jumpDate.value) return;const base=startOfWeek(new Date());const target=startOfWeek(new Date(jumpDate.value));const diffDays=Math.round((target-base)/86400000);weekOffset=Math.trunc(diffDays/7);mobileDayTs=target.getTime();renderAll();}
 
-// Banner
-function updateBanner(){
-  const d=new Date(selectedDayTs);
-  clock.textContent=d.toLocaleDateString(LOCALE,{weekday:'short',day:'2-digit',month:'2-digit'});
-}
+// Clock
+function tick(){clock.textContent=new Date().toLocaleString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
 
-// Desktop
+// Desktop render
 function renderDesktop(){
   grid.innerHTML='';
   const now=Date.now(), base=startOfWeek(new Date()), weekStart=addDays(base,weekOffset*7);
   const tlist=times(START,END,SLOT_MIN);
-
   for(let i=0;i<7;i++){
-    const day=addDays(weekStart,i);
-    const isToday=day.toDateString()===(new Date()).toDateString();
-    const dow=day.getDay();
-    const isWeekend=(dow===0||dow===6);
-
-    const col=document.createElement('div'); 
-    col.className='day'+(isToday?' today':'')+(isWeekend?' weekend':'');
-
+    const day=addDays(weekStart,i), isToday=day.toDateString()===(new Date()).toDateString();
+    const col=document.createElement('div'); col.className='day'+(isToday?' today':'');
     const head=document.createElement('div'); head.className='head';
-    head.innerHTML=`<div class="dnum">${day.toLocaleDateString(LOCALE,{day:'2-digit'})}</div>
-                    <div class="dow">${day.toLocaleDateString(LOCALE,{weekday:'short'})}${isToday?' • heute':''}</div>`;
+    head.innerHTML=`<div class="dnum">${day.toLocaleDateString('de-DE',{day:'2-digit'})}</div><div class="dow">${day.toLocaleDateString('de-DE',{weekday:'short'})}${isToday?' • heute':''}</div>`;
     const list=document.createElement('div'); list.className='slots';
     col.append(head,list);
-
     for(const t of tlist){
       const ts=tsFor(day,t), inPast=ts<now, isBooked=booked.has(ts);
       const btn=document.createElement('button'); btn.type='button'; btn.textContent=t; btn.className='slot';
-      if(isWeekend){btn.disabled=true;btn.classList.add('unavailable');}
       if(selectedTs===ts) btn.classList.add('selected');
       if(inPast||isBooked){btn.disabled=true;btn.classList.add('unavailable')}
-      btn.onclick=()=>{ if(isWeekend) return; selectSlot(ts,btn); selectedDayTs=startOfDay(day).getTime(); updateBanner(); };
+      btn.onclick=()=>selectSlot(ts,btn);
       list.appendChild(btn);
     }
     if(isToday) requestAnimationFrame(()=>positionNowLine(list));
@@ -323,46 +275,29 @@ function renderDesktop(){
   }
 }
 
-// Mobile
+// Mobile render
 function renderMobile(){
   mStrip.innerHTML=''; mSlots.innerHTML='';
   const base=startOfWeek(new Date()), weekStart=addDays(base,weekOffset*7);
   const now=Date.now(), tlist=times(START,END,SLOT_MIN);
-
   for(let i=0;i<7;i++){
-    const day=addDays(weekStart,i);
-    const isToday=day.toDateString()===(new Date()).toDateString();
+    const day=addDays(weekStart,i), isToday=day.toDateString()===(new Date()).toDateString();
     const b=document.createElement('button'); b.type='button'; b.className='date-btn';
-    b.innerHTML=`<div class="dn">${day.toLocaleDateString(LOCALE,{day:'2-digit'})}</div>
-                 <div class="dw">${day.toLocaleDateString(LOCALE,{weekday:'short'})}${isToday?' • heute':''}</div>`;
-    b.onclick=()=>{
-      [...mStrip.children].forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      mobileDayTs = startOfDay(day).getTime();
-      selectedDayTs = mobileDayTs;
-      updateBanner();
-      renderMobileSlots(day,tlist,now);
-    };
-    if((mobileDayTs==null&&isToday)||(mobileDayTs&&startOfDay(new Date(mobileDayTs)).toDateString()===day.toDateString())) b.classList.add('active');
+    b.innerHTML=`<div class="dn">${day.toLocaleDateString('de-DE',{day:'2-digit'})}</div><div class="dw">${day.toLocaleDateString('de-DE',{weekday:'short'})}${isToday?' • heute':''}</div>`;
+    b.onclick=()=>{[...mStrip.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');mobileDayTs=day.getTime();renderMobileSlots(day,tlist,now)}
+    if((mobileDayTs==null&&isToday)||(mobileDayTs&&new Date(mobileDayTs).toDateString()===day.toDateString())) b.classList.add('active');
     mStrip.appendChild(b);
   }
-  const dayToShow=new Date(mobileDayTs??weekStart);
-  selectedDayTs=startOfDay(dayToShow).getTime();
-  updateBanner();
-  renderMobileSlots(dayToShow,tlist,now);
+  renderMobileSlots(new Date(mobileDayTs??weekStart),tlist,now);
 }
-
 function renderMobileSlots(day,tlist,now){
   mSlots.innerHTML='';
-  const isWeekend=([0,6].includes(day.getDay()));
-  if(isWeekend) mSlots.classList.add('weekend-slots'); else mSlots.classList.remove('weekend-slots');
-
   for(const t of tlist){
     const ts=tsFor(day,t), btn=document.createElement('button'); btn.type='button'; btn.textContent=t; btn.className='slot';
     const inPast=ts<now, isBooked=booked.has(ts);
     if(selectedTs===ts) btn.classList.add('selected');
-    if(isWeekend || inPast || isBooked){btn.disabled=true;btn.classList.add('unavailable')}
-    btn.onclick=()=>{ if(isWeekend) return; selectSlot(ts,btn); selectedDayTs=startOfDay(day).getTime(); updateBanner(); };
+    if(inPast||isBooked){btn.disabled=true;btn.classList.add('unavailable')}
+    btn.onclick=()=>selectSlot(ts,btn);
     mSlots.appendChild(btn);
   }
   const isToday=(new Date(day)).toDateString()===(new Date()).toDateString();
@@ -385,13 +320,13 @@ function selectSlot(ts,btn){
   document.querySelectorAll('.slot.selected').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected'); selectedTs=ts;
   const when=new Date(ts);
-  msg.innerHTML=`Ausgewählt: <span class="ok">${when.toLocaleString(LOCALE,{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>`;
+  msg.innerHTML=`Ausgewählt: <span class="ok">${when.toLocaleString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>`;
   confirmBtn.textContent='Weiter';
   confirmBtn.dataset.state='preview';
   confirmBar.classList.add('show');
 }
 
-// Confirm
+// Confirm bar
 confirmBtn.onclick = () => {
   if(confirmBtn.dataset.state === 'preview'){
     formBlock.classList.add('show');
@@ -405,9 +340,14 @@ confirmBtn.onclick = () => {
 
 // Render
 function isMobile(){return matchMedia('(max-width: 720px)').matches}
-async function renderAll(){await loadBooked(); updateBanner(); if(isMobile()) renderMobile(); else renderDesktop();}
+async function renderAll(){
+  await loadBooked();
+  tick();
+  if(isMobile()) renderMobile(); else renderDesktop();
+}
+function tick(){clock.textContent=new Date().toLocaleString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
 
-// Terms-Markierung
+// Checkbox-Fehler
 function markTermsInvalid(on){
   termsLabel.classList.toggle('invalid', !!on);
   termsBox.setAttribute('aria-invalid', on ? 'true' : 'false');
@@ -454,9 +394,11 @@ form.addEventListener('submit', async (e)=>{
 });
 
 // Init
-renderAll();
+tick(); renderAll();
+setInterval(()=>{tick();}, 30000);
+addEventListener('resize', renderAll);
 termsBox.addEventListener('change', ()=> markTermsInvalid(!termsBox.checked));
 })();
 </script>
 </body>
-</html>
+</html> ersetze
