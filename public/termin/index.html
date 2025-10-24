@@ -73,8 +73,6 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
 @media (max-width:720px){
   .grid{display:none}
   .mobile{display:grid;gap:12px}
-  /* Tagesansicht */
-  .date-strip{display:none}
   .m-nav{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:8px}
   .m-title{padding:10px 12px;text-align:center;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:#0f1215}
   .mobile-slots{display:grid;grid-auto-rows:44px;gap:8px;position:relative}
@@ -105,12 +103,13 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
       <a href="/">MEYNIOGLU LAW</a>
     </div>
     <div class="nav-core">
-      <button id="prev" class="btn icon" aria-label="Vorherige Woche">◀</button>
+      <button id="prev" class="btn icon" aria-label="Vorheriger Tag">◀</button>
       <input id="jumpDate" class="datepick" type="date" aria-label="Datum auswählen">
-      <button id="next" class="btn icon" aria-label="Nächste Woche">▶</button>
+      <button id="next" class="btn icon" aria-label="Nächster Tag">▶</button>
     </div>
     <div class="controls">
-      <button id="toggle" class="btn" type="button">Zurück zur Startseite</button>    </div>
+      <button id="toggle" class="btn" type="button">Zurück zur Startseite</button>
+    </div>
   </div>
 
   <div class="card">
@@ -202,8 +201,7 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
 const SLOT_MIN=30, START="08:00", END="17:00";
 
 // State
-let weekOffset=0, selectedTs=null;
-// Tagesauswahl für Mobile
+let weekOffset = 0, selectedTs = null;
 let selectedDayTs = new Date(new Date().setHours(0,0,0,0)).getTime();
 const booked=new Set();
 
@@ -233,6 +231,24 @@ const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;}
 const startOfWeek=d=>{const x=new Date(d);const w=(x.getDay()+6)%7;x.setDate(x.getDate()-w);x.setHours(0,0,0,0);return x;}
 const times=(a,b,step)=>{const out=[];for(let m=toMin(a);m<toMin(b);m+=step){out.push(`${String(m/60|0).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`)}return out;}
 const tsFor=(date,hm)=>{const[h,m]=hm.split(':').map(Number);const x=new Date(date);x.setHours(h,m,0,0);return x.getTime()}
+const dayStart = ts => { const d=new Date(ts); d.setHours(0,0,0,0); return d.getTime(); };
+
+function updateHeadline(){
+  const d = new Date(selectedDayTs ?? Date.now());
+  clock.textContent = d.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'});
+  mTitle.textContent = clock.textContent;
+}
+
+function setSelectedDay(ts){
+  selectedDayTs = dayStart(ts);
+  const base = startOfWeek(new Date());
+  const target = startOfWeek(new Date(selectedDayTs));
+  const diffDays = Math.round((target-base)/86400000);
+  weekOffset = Math.trunc(diffDays/7);
+  jumpDate.value = new Date(selectedDayTs).toISOString().slice(0,10);
+  updateHeadline();
+  renderAll();
+}
 
 // Load booked
 async function loadBooked(){
@@ -248,22 +264,15 @@ async function loadBooked(){
 }
 
 // Controls
-prev.onclick =()=>{weekOffset--; renderAll()}
-next.onclick =()=>{weekOffset++; renderAll()}
-toggle.textContent = 'Zurück zur Startseite';
-toggle.onclick = () => { window.location.href = '/'; };
+prev.onclick = ()=> setSelectedDay(addDays(new Date(selectedDayTs), -1).getTime());
+next.onclick = ()=> setSelectedDay(addDays(new Date(selectedDayTs), +1).getTime());
+toggle.onclick = ()=>{ window.location.href = '/'; };
+
 jumpDate.value=new Date().toISOString().slice(0,10);
-jumpDate.onchange=()=>{ if(!jumpDate.value) return;
-  const base=startOfWeek(new Date());
-  const target=startOfWeek(new Date(jumpDate.value));
-  const diffDays=Math.round((target-base)/86400000);
-  weekOffset=Math.trunc(diffDays/7);
-  selectedDayTs=new Date(new Date(jumpDate.value).setHours(0,0,0,0)).getTime();
-  renderAll();
-}
+jumpDate.onchange=()=>{ if(jumpDate.value) setSelectedDay(new Date(jumpDate.value).getTime()); };
 
 // Clock
-function tick(){clock.textContent=new Date().toLocaleString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+setInterval(updateHeadline, 30000);
 
 // Desktop render
 function renderDesktop(){
@@ -286,7 +295,7 @@ function renderDesktop(){
       const btn=document.createElement('button'); btn.type='button'; btn.textContent=t; btn.className='slot';
       if(selectedTs===ts) btn.classList.add('selected');
       if(isWeekend || inPast || isBooked){btn.disabled=true;btn.classList.add('unavailable')}
-      btn.onclick=()=>{ if(isWeekend) return; selectSlot(ts,btn); selectedDayTs=new Date(day.setHours(0,0,0,0)).getTime(); };
+      btn.onclick=()=>{ if(isWeekend) return; selectSlot(ts,btn); setSelectedDay(ts); };
       list.appendChild(btn);
     }
     if(isToday) requestAnimationFrame(()=>positionNowLine(list));
@@ -296,14 +305,13 @@ function renderDesktop(){
 
 // Mobile render (Tagesansicht)
 function renderMobile(){
+  updateHeadline();
   const d = new Date(selectedDayTs);
-  mTitle.textContent = d.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'});
-
   const now=Date.now(), tlist=times(START,END,SLOT_MIN);
   renderMobileSlots(d,tlist,now);
 }
-mPrev?.addEventListener('click', ()=>{ selectedDayTs = addDays(new Date(selectedDayTs),-1).getTime(); renderMobile(); });
-mNext?.addEventListener('click', ()=>{ selectedDayTs = addDays(new Date(selectedDayTs), 1).getTime(); renderMobile(); });
+mPrev?.addEventListener('click', ()=> setSelectedDay(addDays(new Date(selectedDayTs), -1).getTime()));
+mNext?.addEventListener('click', ()=> setSelectedDay(addDays(new Date(selectedDayTs), +1).getTime()));
 
 function renderMobileSlots(day,tlist,now){
   mSlots.innerHTML='';
@@ -333,6 +341,7 @@ function positionNowLine(container){
 }
 
 function selectSlot(ts,btn){
+  setSelectedDay(ts);
   document.querySelectorAll('.slot.selected').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected'); selectedTs=ts;
   const when=new Date(ts);
@@ -358,23 +367,19 @@ confirmBtn.onclick = () => {
 function isMobile(){return matchMedia('(max-width: 720px)').matches}
 async function renderAll(){
   await loadBooked();
-  tick();
+  updateHeadline();
   if(isMobile()) renderMobile(); else renderDesktop();
 }
 
-// Checkbox-Fehler
+// Submit
 function markTermsInvalid(on){
   termsLabel.classList.toggle('invalid', !!on);
   termsBox.setAttribute('aria-invalid', on ? 'true' : 'false');
 }
-
-// Submit
 form.addEventListener('submit', async (e)=>{
   e.preventDefault(); msg.textContent=''; markTermsInvalid(false);
-
   if(selectedTs==null){msg.innerHTML='<span class="err">Bitte erst einen Termin wählen.</span>';return;}
   const f=form;
-
   const payload = {
     firstName: f.first.value.trim(),
     lastName:  f.last.value.trim(),
@@ -387,7 +392,6 @@ form.addEventListener('submit', async (e)=>{
     endISO:    new Date(selectedTs + SLOT_MIN*60000).toISOString(),
     taken:     true
   };
-
   if(!payload.firstName || !payload.lastName){msg.innerHTML='<span class="err">Vor- und Nachname angeben.</span>';return;}
   if(!payload.gender){msg.innerHTML='<span class="err">Geschlecht wählen.</span>';return;}
   if(!payload.birthDate){msg.innerHTML='<span class="err">Geburtsdatum angeben.</span>';return;}
@@ -399,7 +403,6 @@ form.addEventListener('submit', async (e)=>{
     const r = await fetch('/api/book', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
     const js = await r.json().catch(()=>({ok:false,error:'Server'}));
     if(!r.ok || !js.ok) throw new Error(js.error || 'Technische Störung – bitte später versuchen.');
-
     msg.innerHTML='<span class="ok">Termin bestätigt. Bestätigung folgt per E-Mail/SMS.</span>';
     f.reset(); confirmBar.classList.remove('show'); formBlock.classList.remove('show');
     await loadBooked(); selectedTs=null; renderAll();
@@ -409,8 +412,7 @@ form.addEventListener('submit', async (e)=>{
 });
 
 // Init
-tick(); renderAll();
-setInterval(()=>{tick();}, 30000);
+setSelectedDay(Date.now());
 addEventListener('resize', renderAll);
 termsBox.addEventListener('change', ()=> markTermsInvalid(!termsBox.checked));
 })();
