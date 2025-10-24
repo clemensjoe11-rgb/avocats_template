@@ -4,9 +4,36 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Termin buchen – MEYNIOGLU LAW</title>
+
+<!-- Theme-Bootstrap: liest/synchronisiert localStorage.theme -->
+<script>
+(function(){
+  try{
+    let t = localStorage.getItem('theme');
+    if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+    addEventListener('storage', e=>{
+      if(e.key==='theme' && e.newValue){
+        document.documentElement.dataset.theme = e.newValue;
+      }
+    });
+  }catch(e){}
+})();
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--brand:#8d6041;--brand-600:#a87a56;--bg:#0b0c0f;--card:#15181c;--text:#e8edf2;--muted:#9aa3ad;--danger:#ff5c5c}
+/* Light als Default, Dark via [data-theme="dark"] */
+:root{
+  --brand:#8d6041;--brand-600:#a87a56;
+  --bg:#f7f8fa;--card:#ffffff;--text:#0e1116;--muted:#6b7280;--danger:#ff5c5c;
+  --hair:rgba(2,6,23,.14);--field:#ffffff
+}
+[data-theme="dark"]{
+  --bg:#0b0c0f;--card:#15181c;--text:#e8edf2;--muted:#9aa3ad;
+  --hair:rgba(255,255,255,.18);--field:#0f1215
+}
+
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-ui,Segoe UI,Arial;display:grid;place-items:start center;min-height:100svh}
@@ -19,14 +46,14 @@ body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-
 .brand a{color:var(--text);text-decoration:none;font-weight:600}
 .nav-core{grid-column:2;justify-self:center;display:flex;align-items:center;gap:12px}
 .controls{grid-column:3;justify-self:end}
-.btn{border-radius:12px;padding:8px 12px;cursor:pointer;font-weight:600;border:1px solid rgba(255,255,255,.18);background:transparent;color:var(--text)}
+.btn{border-radius:12px;padding:8px 12px;cursor:pointer;font-weight:600;border:1px solid var(--hair);background:transparent;color:var(--text)}
 .btn.icon{width:40px;height:40px;display:grid;place-items:center;font-size:18px;border-radius:10px}
 .btn.primary{background:var(--brand);border:none;color:#0b0c0f}
 .btn.primary:hover{background:var(--brand-600)}
-.datepick{appearance:none;background:#0f1215;border:1px solid rgba(255,255,255,.18);color:var(--text);padding:8px 10px;border-radius:10px;font:inherit}
+.datepick{appearance:none;background:var(--field);border:1px solid var(--hair);color:var(--text);padding:8px 10px;border-radius:10px;font:inherit}
 
 /* Shell */
-.card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:16px}
 .clock{color:var(--muted);text-align:center;margin-bottom:12px;font-variant-numeric:tabular-nums}
 
 /* Collapsible */
@@ -39,12 +66,13 @@ body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-
 .head{display:grid;align-content:center;justify-items:center;gap:4px;height:64px;text-align:center}
 .dnum{font-weight:600;display:inline-grid;place-items:center;min-width:3ch}
 .dow{color:var(--muted);font-size:12px;white-space:nowrap}
-.today .dnum{background:rgba(255,255,255,.1);padding:3px 10px;border-radius:999px}
+.today .dnum{background:rgba(0,0,0,.06);padding:3px 10px;border-radius:999px}
+[data-theme="dark"] .today .dnum{background:rgba(255,255,255,.1)}
 .slots{display:grid;grid-auto-rows:44px;gap:10px;position:relative}
 .slot{height:44px;display:grid;place-items:center;border-radius:14px;border:1px dashed transparent;background:var(--brand);color:#0b0c0f;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer}
 .slot:hover{background:var(--brand-600)}
-.slot.selected{outline:2px solid #fff}
-.slot.unavailable{background:transparent;border-color:rgba(255,255,255,.2);color:var(--muted);text-decoration:line-through;cursor:not-allowed}
+.slot.selected{outline:2px solid currentColor}
+.slot.unavailable{background:transparent;border-color:var(--hair);color:var(--muted);text-decoration:line-through;cursor:not-allowed}
 .now-line{position:absolute;left:0;right:0;height:2px;background:var(--danger);box-shadow:0 0 0 2px rgba(255,92,92,.15)}
 .now-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--danger);left:-6px;transform:translateY(-4px)}
 
@@ -54,7 +82,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 Inter,system-
 .form{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));column-gap:16px;row-gap:14px}
 .form .full{grid-column:1/-1}
 label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:#0f1215;color:var(--text)}
+input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--hair);background:var(--field);color:var(--text)}
 .inline{display:grid;grid-template-columns:140px 1fr;gap:10px}
 
 /* Terms */
@@ -66,7 +94,7 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
 
 /* Hinweise */
 .hint{color:var(--muted);font-size:13px;margin-top:6px}
-.ok{color:#3ddc97}.err{color:#ff6b6b}
+.ok{color:#0a8a5b}.err{color:#ff6b6b}
 
 /* Mobile */
 .mobile{display:none}
@@ -74,7 +102,7 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
   .grid{display:none}
   .mobile{display:grid;gap:12px}
   .m-nav{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:8px}
-  .m-title{padding:10px 12px;text-align:center;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:#0f1215}
+  .m-title{padding:10px 12px;text-align:center;border-radius:12px;border:1px solid var(--hair);background:var(--field)}
   .mobile-slots{display:grid;grid-auto-rows:44px;gap:8px;position:relative}
   .slot{height:44px;border-radius:12px}
   .form{grid-template-columns:1fr}
@@ -89,7 +117,7 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
 .calendar-hidden .form-block{display:none!important}
 
 /* Floating Confirm */
-.confirm-bar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:none;background:rgba(21,24,28,.92);border-top:1px solid rgba(255,255,255,.08);backdrop-filter:blur(6px);padding:12px 16px}
+.confirm-bar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:none;background:rgba(21,24,28,.92);border-top:1px solid var(--hair);backdrop-filter:blur(6px);padding:12px 16px}
 .confirm-bar.show{display:block}
 .confirm-bar .btn{width:100%;height:48px;font-weight:700;border-radius:12px}
 .calendar-hidden .confirm-bar{display:none!important}
@@ -233,17 +261,13 @@ const times=(a,b,step)=>{const out=[];for(let m=toMin(a);m<toMin(b);m+=step){out
 const tsFor=(date,hm)=>{const[h,m]=hm.split(':').map(Number);const x=new Date(date);x.setHours(h,m,0,0);return x.getTime()}
 const dayStart = ts => { const d=new Date(ts); d.setHours(0,0,0,0); return d.getTime(); };
 
-// Headline time/date (oben und mobile Titel)
+// Headline: Uhr oben HH:MM, mobiler Titel = Datum
 function updateHeadline(){
-  // Uhr oben: nur aktuelle Uhrzeit
   const now = new Date();
   clock.textContent = now.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
-
-  // Mobile-Titel: gewähltes Datum (ohne Uhrzeit)
   const d = new Date(selectedDayTs ?? Date.now());
   mTitle.textContent = d.toLocaleDateString('de-DE', { weekday:'short', day:'2-digit', month:'2-digit' });
 }
-
 setInterval(()=>{ if(!document.hidden) updateHeadline(); }, 30000);
 
 function setSelectedDay(ts){
@@ -274,7 +298,6 @@ async function loadBooked(){
 prev.onclick = ()=> setSelectedDay(addDays(new Date(selectedDayTs), -1).getTime());
 next.onclick = ()=> setSelectedDay(addDays(new Date(selectedDayTs), +1).getTime());
 toggle.onclick = ()=>{ window.location.href = '/'; };
-
 jumpDate.value=new Date().toISOString().slice(0,10);
 jumpDate.onchange=()=>{ if(jumpDate.value) setSelectedDay(new Date(jumpDate.value).getTime()); };
 
@@ -307,7 +330,7 @@ function renderDesktop(){
   }
 }
 
-// Mobile (Tagesansicht)
+// Mobile
 function renderMobile(){
   updateHeadline();
   const d = new Date(selectedDayTs);
