@@ -2,7 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<script>(function(){try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){}})();</script>
+<!-- Theme bootstrap: liest/setzt localStorage.theme -->
+<script>
+(function(){
+  try{
+    let t = localStorage.getItem('theme');
+    if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  }catch(e){}
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>MEYNIOGLU LAW</title>
 <meta name="description" content="Familienrecht, Scheidungen und Auflösung – Beratung und Vertretung."/>
@@ -13,7 +22,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
 <style>
-:root{--brand:#8d6041;--accent:#a98770;--bs-danger:#8d6041;--bs-danger-rgb:141,96,65;--bg:#f7f8fa;--text:#0e1116;--surface:#ffffff;--border:rgba(2,6,23,.12);--hero-img:url('assets/img/header.png')}
+:root{
+  --brand:#8d6041;--accent:#a98770;--bs-danger:#8d6041;--bs-danger-rgb:141,96,65;
+  --bg:#f7f8fa;--text:#0e1116;--surface:#ffffff;--border:rgba(2,6,23,.12);
+  --hero-img:url('assets/img/header.png')
+}
 [data-theme="dark"]{--bg:#0b0c0f;--text:#e7eaee;--surface:#17191d;--border:rgba(255,255,255,.08)}
 
 html,body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
@@ -99,9 +112,10 @@ img.logo.dark-only{display:none}
       </ul>
       <div class="ms-lg-3 d-flex gap-2">
         <a class="btn btn-ghost btn-sm" href="#kontakt">Initial consultation</a>
-        <!-- geändert: Link führt auf die Termin-Seite -->
         <a class="btn btn-danger btn-sm" href="/termin/index.html">Book an appointment</a>
-        <button id="themeToggle" class="btn btn-sm theme-toggle" type="button" aria-label="Switch theme"><i class="bi bi-moon"></i></button>
+        <button id="themeToggle" class="btn btn-sm theme-toggle" type="button" aria-label="Switch theme">
+          <i id="themeIcon" class="bi"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -237,7 +251,6 @@ img.logo.dark-only{display:none}
             </div>
           </div>
 
-          <!-- zusätzlicher Call-to-Action unten -->
           <a class="btn btn-danger" href="/termin/index.html">
             <i class="bi bi-calendar-check me-1"></i> Book an appointment
           </a>
@@ -257,18 +270,35 @@ img.logo.dark-only{display:none}
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 (function(){
+  // Map + year
   var lat = 49.6067391, lng = 6.1189789;
   var map = L.map('map', { zoomControl:false, attributionControl:false }).setView([lat, lng], 16);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
   L.marker([lat, lng]).addTo(map);
   document.getElementById('y').textContent = new Date().getFullYear();
+
+  // Theme toggle sync
+  var btn = document.getElementById('themeToggle');
+  var icn = document.getElementById('themeIcon');
+  function paintIcon(){
+    var dark = document.documentElement.dataset.theme === 'dark';
+    icn.className = 'bi ' + (dark ? 'bi-moon' : 'bi-sun');
+  }
+  paintIcon();
+  btn.addEventListener('click', function(){
+    var next = (document.documentElement.dataset.theme === 'dark') ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try{ localStorage.setItem('theme', next); }catch(e){}
+    paintIcon();
+  });
+  // sync across tabs/pages
+  addEventListener('storage', function(e){
+    if(e.key==='theme' && e.newValue){
+      document.documentElement.dataset.theme = e.newValue;
+      paintIcon();
+    }
+  });
 })();
 </script>
-
-<!-- optionale eigene Skripte, nur einbinden wenn vorhanden -->
-<script src="js/theme.js"></script>
-<script src="js/nav.js"></script>
-<script src="js/hero.js"></script>
-<script src="js/reveal.js"></script>
 </body>
 </html>
