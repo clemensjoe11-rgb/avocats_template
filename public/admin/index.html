@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="de" data-theme="">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin – MEYNIOGLU LAW</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--brand:#8d6041;--brand-600:#a87a56;--bg:#f7f8fa;--card:#ffffff;--text:#0e1116;--muted:#6b7280;--hair:rgba(2,6,23,.14);--field:#ffffff;--danger:#e11d48;--ok:#0a8a5b}
+[data-theme="dark"]{--bg:#0b0c0f;--card:#15181c;--text:#e8edf2;--muted:#9aa3ad;--hair:rgba(255,255,255,.16);--field:#0f1215}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Inter,system-ui,Segoe UI,Arial}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}.hdr{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.hdr h1{font-size:20px;margin:0;font-weight:700}.btn{border-radius:10px;padding:8px 12px;border:1px solid var(--hair);background:transparent;color:var(--text);cursor:pointer;font-weight:600}
+.btn.primary{background:var(--brand);border:none;color:#0b0c0f}.btn.primary:hover{background:var(--brand-600)}.btn.danger{background:transparent;border-color:var(--hair);color:var(--danger)}
+.input,select{background:var(--field);border:1px solid var(--hair);color:var(--text);padding:9px 10px;border-radius:10px;font:inherit}
+.row{display:flex;gap:10px;flex-wrap:wrap}.card{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:14px}
+.tbl{width:100%;border-collapse:separate;border-spacing:0}.tbl th,.tbl td{padding:10px 12px;border-bottom:1px solid var(--hair);vertical-align:middle}
+.tbl th{font-size:12px;color:var(--muted);font-weight:600;text-align:left;letter-spacing:.02em}.badge{padding:.25rem .5rem;border-radius:.5rem;border:1px solid var(--hair);font-size:12px;color:var(--muted)}
+.msg{margin-top:8px;font-size:13px;color:var(--muted)}.ok{color:var(--ok)} .err{color:var(--danger)}.center{display:grid;place-items:center;min-height:60vh}
+.login{width:min(360px,100%);} .login h2{margin:0 0 12px 0;font-size:18px}.login .row{margin-top:10px}.hidden{display:none !important}.action{white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <h1>Admin · Termine</h1>
+    <div class="row">
+      <a class="btn" href="/">Zur Website</a>
+      <button id="logoutBtn" class="btn hidden">Logout</button>
+    </div>
+  </div>
+
+  <div id="loginBox" class="center">
+    <form id="loginForm" class="card login" autocomplete="on">
+      <h2>Anmelden</h2>
+      <label>Benutzername
+        <input id="u" class="input" name="username" autocomplete="username" required>
+      </label>
+      <div style="height:8px"></div>
+      <label>Passwort
+        <input id="p" class="input" name="password" type="password" autocomplete="current-password" required>
+      </label>
+      <div class="row"><button class="btn primary" type="submit">Login</button></div>
+      <div id="loginMsg" class="msg"></div>
+    </form>
+  </div>
+
+  <div id="panel" class="hidden">
+    <div class="card" style="margin-bottom:12px">
+      <div class="row">
+        <input id="q" class="input" placeholder="Suchen: Name, E-Mail, Telefon">
+        <input id="dateFrom" class="input" type="date" title="von">
+        <input id="dateTo" class="input" type="date" title="bis">
+        <button id="refresh" class="btn">Aktualisieren</button>
+        <button id="exportBtn" class="btn">CSV Export</button>
+      </div>
+      <div id="status" class="msg"></div>
+    </div>
+    <div class="card">
+      <table class="tbl" id="table">
+        <thead><tr><th>Datum</th><th>Zeit</th><th>Name</th><th>Kontakt</th><th>Geburtsdatum</th><th>Geschlecht</th><th>Status</th><th class="action">Aktionen</th></tr></thead>
+        <tbody id="tbody"><tr><td colspan="8" class="msg">Keine Daten.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const API={me:'/api/admin/me',login:'/api/admin/login',logout:'/api/admin/logout',slots:'/api/admin/slots',deleteById:id=>`/api/admin/slots/${encodeURIComponent(id)}`,deleteByStart:'/api/admin/deleteByStart'};
+let csrfToken=null;
+const loginBox=document.getElementById('loginBox'); const panel=document.getElementById('panel'); const loginMsg=document.getElementById('loginMsg'); const logoutBtn=document.getElementById('logoutBtn');
+function showPanel(on){ if(on){ loginBox.classList.add('hidden'); panel.classList.remove('hidden'); logoutBtn.classList.remove('hidden'); } else { loginBox.classList.remove('hidden'); panel.classList.add('hidden'); logoutBtn.classList.add('hidden'); } }
+async function getJSON(resp){ const ct=resp.headers.get('content-type')||''; if(ct.includes('application/json')) return resp.json(); const t=await resp.text(); try{return JSON.parse(t);}catch{return {ok:false,error:'Serverfehler'}}}
+async function checkAuth(){ try{ const r=await fetch(API.me,{credentials:'include'}); if(r.status===200){ const js=await getJSON(r); csrfToken=js.csrf||null; showPanel(true); load(); } else showPanel(false);}catch{ showPanel(false);}}
+document.getElementById('loginForm').addEventListener('submit', async e=>{e.preventDefault(); loginMsg.textContent='Prüfe Zugang…'; const body={username:document.getElementById('u').value.trim(), password:document.getElementById('p').value}; try{ const r=await fetch(API.login,{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); const js=await getJSON(r); if(r.ok&&js.ok!==false){ csrfToken=js.csrf||null; showPanel(true); load(); loginMsg.textContent=''; } else { loginMsg.innerHTML='<span class="err">'+(js.error||'Login fehlgeschlagen')+'</span>'; } }catch{ loginMsg.innerHTML='<span class="err">Netzwerkfehler</span>'; }});
+logoutBtn.onclick=async()=>{try{await fetch(API.logout,{method:'POST',credentials:'include',headers: csrfToken?{'X-CSRF-Token':csrfToken}:{}});}catch{} csrfToken=null; showPanel(false);};
+
+const tbody=document.getElementById('tbody'); const status=document.getElementById('status'); const q=document.getElementById('q'); const dateFrom=document.getElementById('dateFrom'); const dateTo=document.getElementById('dateTo'); const refresh=document.getElementById('refresh'); const exportBtn=document.getElementById('exportBtn');
+let rows=[];
+function fmtD(iso){ try{ return new Date(iso).toLocaleDateString('de-DE',{weekday:'short',year:'numeric',month:'2-digit',day:'2-digit'});}catch{return ''}}
+function fmtT(iso){ try{ return new Date(iso).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});}catch{return ''}}
+async function fetchAll(){ status.textContent='Lade…'; try{ const qs=new URLSearchParams(); if(q.value.trim()) qs.set('q',q.value.trim()); if(dateFrom.value) qs.set('from',dateFrom.value); if(dateTo.value) qs.set('to',dateTo.value); const r=await fetch(`${API.slots}?${qs.toString()}`,{credentials:'include'}); const js=await getJSON(r); if(!r.ok) throw new Error(js.error||'Fehler beim Laden'); status.textContent=''; return js.data||js; }catch(e){ status.innerHTML='<span class="err">'+(e.message||'Serverfehler')+'</span>'; return [];}}
+function render(){ const term=q.value.trim().toLowerCase(); const from=dateFrom.value?new Date(dateFrom.value).getTime():-Infinity; const to=dateTo.value?new Date(dateTo.value).getTime()+86400000-1:Infinity; const data=rows.filter(r=>{ const t=(r.firstName+' '+r.lastName+' '+(r.email||'')+' '+(r.phone||'')).toLowerCase(); const ts=new Date(r.startISO).getTime(); return (!term||t.includes(term)) && ts>=from && ts<=to; }).sort((a,b)=> new Date(a.startISO)-new Date(b.startISO)); tbody.innerHTML=''; if(!data.length){ tbody.innerHTML='<tr><td colspan="8" class="msg">Keine Treffer.</td></tr>'; return;} for(const it of data){ const tr=document.createElement('tr'); tr.innerHTML=`
+      <td>${fmtD(it.startISO)}</td>
+      <td>${fmtT(it.startISO)}–${fmtT(it.endISO)}</td>
+      <td>${(it.firstName||'')} ${(it.lastName||'')}</td>
+      <td><div>${it.email||''}</div><div class="badge">${(it.countryCode||'')} ${(it.phone||'')}</div></td>
+      <td>${it.birthDate||''}</td>
+      <td>${it.gender||''}</td>
+      <td>${it.taken ? '<span class="badge">gebucht</span>' : '<span class="badge">frei</span>'}</td>
+      <td class="action"><button class="btn danger" data-del="${it.id??''}" data-start="${it.startISO}">Löschen</button></td>`; tbody.appendChild(tr);}}
+async function load(){ rows=await fetchAll(); render(); }
+tbody.addEventListener('click', async e=>{ const btn=e.target.closest('button[data-del]'); if(!btn) return; if(!confirm('Diesen Termin wirklich löschen?')) return; const id=btn.dataset.del; const startISO=btn.dataset.start; btn.disabled=true; btn.textContent='Lösche…'; try{ let r,js; const hdr={'Content-Type':'application/json'}; if(csrfToken) hdr['X-CSRF-Token']=csrfToken; if(id){ r=await fetch(API.deleteById(id),{method:'DELETE',credentials:'include',headers:hdr}); js=await getJSON(r); if(!r.ok||js.ok===false) throw new Error(js.error||'Fehler beim Löschen'); } else { r=await fetch(API.deleteByStart,{method:'POST',credentials:'include',headers:hdr,body:JSON.stringify({startISO})}); js=await getJSON(r); if(!r.ok||js.ok===false) throw new Error(js.error||'Fehler beim Löschen'); } rows=rows.filter(x => (x.id && x.id===id) ? false : (!x.id && x.startISO===startISO ? false : true)); render(); status.innerHTML='<span class="ok">Termin gelöscht.</span>'; }catch(err){ status.innerHTML='<span class="err">'+(err.message||'Löschfehler')+'</span>'; btn.disabled=false; btn.textContent='Löschen'; }});
+[q,dateFrom,dateTo].forEach(el=> el.addEventListener('input', render)); refresh.addEventListener('click', load);
+exportBtn.addEventListener('click', ()=>{ const headers=['Datum','Start','Ende','Vorname','Nachname','E-Mail','Telefon','Ländercode','Geburtsdatum','Geschlecht','Status','ID']; const data=[headers.join(';')]; for(const r of rows){ data.push([fmtD(r.startISO),fmtT(r.startISO),fmtT(r.endISO),r.firstName||'',r.lastName||'',r.email||'',r.phone||'',r.countryCode||'',r.birthDate||'',r.gender||'',r.taken?'gebucht':'frei',r.id||''].map(v=> String(v).replace(/;/g, ',')).join(';')); } const blob=new Blob([data.join('\n')],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='termine.csv'; a.click(); URL.revokeObjectURL(url);});
+checkAuth();
+})();
+</script>
+</body>
+</html>
