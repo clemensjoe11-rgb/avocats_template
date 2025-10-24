@@ -110,8 +110,7 @@ input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid rg
       <button id="next" class="btn icon" aria-label="Nächste Woche">▶</button>
     </div>
     <div class="controls">
-      <button id="toggle" class="btn" aria-expanded="true">Kalender verbergen</button>
-    </div>
+      <button id="toggle" class="btn" type="button">Zurück zur Startseite</button>    </div>
   </div>
 
   <div class="card">
@@ -251,7 +250,8 @@ async function loadBooked(){
 // Controls
 prev.onclick =()=>{weekOffset--; renderAll()}
 next.onclick =()=>{weekOffset++; renderAll()}
-toggle.onclick=()=>{const hide=document.body.classList.toggle('calendar-hidden');toggle.setAttribute('aria-expanded',String(!hide));calWrap.classList.toggle('open',!hide);if(hide){confirmBar.classList.remove('show');}}
+toggle.textContent = 'Zurück zur Startseite';
+toggle.onclick = () => { window.location.href = '/'; };
 jumpDate.value=new Date().toISOString().slice(0,10);
 jumpDate.onchange=()=>{ if(!jumpDate.value) return;
   const base=startOfWeek(new Date());
